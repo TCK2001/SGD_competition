@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0eafc, #cfdef3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        input[type="text"], input[type="number"], input[type="password"] {
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus, input[type="number"]:focus, input[type="password"]:focus {
+            border-color: #6b7280;
+        }
+        input[type="submit"] {
+            padding: 12px;
+            font-size: 16px;
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background-color: #4338ca;
+        }
+        .message {
+            margin-top: 20px;
+            color: #16a34a;
+            font-size: 14px;
+        }
+        .error {
+            color: #e53e3e;
+        }
+        .example {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: -15px;
+        }
+        @media (max-width: 500px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+    <script>
+        function validateForm(event) {
+            let regionInput = document.getElementById("region");
+            let errorMessage = document.getElementById("error-message");
+
+            let regionValue = regionInput.value.trim();
+            let regex = /.+區.+路/; // Must include "區" and "路"
+
+            if (!regex.test(regionValue)) {
+                errorMessage.textContent = "The address must be in the format 'xxx區 xxx路'.";
+                event.preventDefault(); // Prevent form submission
+                return false;
+            } else {
+                errorMessage.textContent = ""; // Clear error message
+                return true;
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Sign Up</h1>
+        <form method="POST" onsubmit="return validateForm(event)">
+            <input type="text" name="name" placeholder="Full Name" required>
+            <input type="number" name="age" placeholder="Age" required>
+            <input type="text" name="region" id="region" placeholder="Region (e.g., 台南市北區前鋒路)" required>
+            <p class="example">Example: 台南市北區前鋒路</p>
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <input type="submit" value="Sign Up">
+        </form>
+        <p id="error-message" class="error"></p>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="{% if 'error' in message or 'already' in message %}error{% else %}message{% endif %}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+</body>
+</html>

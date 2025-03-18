@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Sharing Platform</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+        }
+        .main-content {
+            flex: 3;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        h1 {
+            color: #2d3748;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        h2, h3 {
+            color: #4a5568;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        .nav-links a {
+            color: #4f46e5;
+            text-decoration: none;
+            margin-right: 15px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .nav-links a:hover {
+            color: #4338ca;
+        }
+        .filter-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .filter-form select {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9fafb;
+            cursor: pointer;
+        }
+        .filter-form input[type="submit"] {
+            padding: 8px 15px;
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .filter-form input[type="submit"]:hover {
+            background-color: #4338ca;
+        }
+        .post {
+            background: #f9fafb;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            transition: transform 0.2s ease;
+        }
+        .post:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        .post p {
+            margin: 10px 0;
+            color: #4a5568;
+            font-size: 16px;
+        }
+        .post img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+        .post-actions {
+            margin-top: 10px;
+        }
+        .styled-input {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9fafb;
+            width: 150px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .styled-input:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 5px rgba(79, 70, 229, 0.5);
+            outline: none;
+        }
+        button, .apply-btn {
+            padding: 10px 20px;
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+        }
+        button:hover, .apply-btn:hover {
+            background-color: #4338ca;
+        }
+        .edit-btn {
+            padding: 10px 20px;
+            background-color: #38a169;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .edit-btn:hover {
+            background-color: #2f855a;
+        }
+        .logout-btn {
+            padding: 10px 20px;
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .logout-btn:hover {
+            background-color: #c53030;
+        }
+        .applied-message {
+            color: #e53e3e;
+            font-weight: 500;
+        }
+        .self-post-message {
+            color: #718096;
+            font-weight: 500;
+        }
+        .message {
+            color: #16a34a;
+            margin-top: 10px;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #e2e8f0;
+            margin: 20px 0;
+        }
+        @media (max-width: 800px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                position: static;
+            }
+            .main-content, .sidebar {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 28px;
+            }
+            h2, h3 {
+                font-size: 20px;
+            }
+            .filter-form {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+    <script>
+        const districts = {
+            "台北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
+            "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "樹林區", "鶯歌區", "三峽區", "淡水區", "汐止區", "瑞芳區", "土城區", "蘆洲區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "烏來區"],
+            "桃園市": ["桃園區", "中壢區", "平鎮區", "八德區", "楊梅區", "蘆竹區", "大溪區", "龍潭區", "龜山區", "大園區", "觀音區", "新屋區", "復興區"],
+            "台中市": ["中區", "東區", "南區", "西區", "北區", "北屯區", "西屯區", "南屯區", "太平區", "大里區", "霧峰區", "烏日區", "豐原區", "后里區", "石岡區", "東勢區", "和平區", "新社區", "潭子區", "大雅區", "神岡區", "大肚區", "沙鹿區", "龍井區", "梧棲區", "清水區", "大甲區", "外埔區", "大安區"],
+            "台南市": ["中西區", "東區", "南區", "北區", "安平區", "安南區", "永康區", "歸仁區", "新化區", "左鎮區", "玉井區", "楠西區", "南化區", "仁德區", "關廟區", "龍崎區", "官田區", "麻豆區", "佳里區", "西港區", "七股區", "將軍區", "學甲區", "北門區", "新營區", "後壁區", "白河區", "東山區", "六甲區", "下營區", "柳營區", "鹽水區"],
+            "高雄市": ["楠梓區", "左營區", "鼓山區", "三民區", "鹽埕區", "前金區", "新興區", "苓雅區", "前鎮區", "旗津區", "小港區", "鳳山區", "大寮區", "鳥松區", "林園區", "仁武區", "大樹區", "大社區", "岡山區", "路竹區", "橋頭區", "梓官區", "彌陀區", "永安區", "燕巢區", "田寮區", "阿蓮區", "茄萣區", "湖內區", "旗山區", "美濃區", "內門區", "甲仙區", "六龜區", "杉林區", "桃源區", "那瑪夏區", "茂林區"],
+            "基隆市": ["仁愛區", "信義區", "中正區", "中山區", "安樂區", "暖暖區", "七堵區"],
+            "新竹市": ["東區", "北區", "香山區"],
+            "嘉義市": ["東區", "西區"]
+        };
+        const roads = ["東豐路", "前鋒路", "成功路", "復興路"]; // 도로 목록 (필요 시 추가)
+
+        function updateDistricts() {
+            let citySelect = document.querySelector("select[name='city']");
+            let districtSelect = document.querySelector("select[name='district']");
+            let selectedCity = citySelect.value;
+            let selectedDistrict = districtSelect.getAttribute("data-selected");
+
+            districtSelect.innerHTML = '<option value="">Select District</option>';
+            if (selectedCity && districts[selectedCity]) {
+                districts[selectedCity].forEach(district => {
+                    let option = document.createElement("option");
+                    option.value = district;
+                    option.textContent = district;
+                    if (district === selectedDistrict) option.selected = true;
+                    districtSelect.appendChild(option);
+                });
+            }
+        }
+
+        window.onload = function() {
+            let districtSelect = document.querySelector("select[name='district']");
+            let selectedDistrict = "{{ selected_district|default('') }}";
+            districtSelect.setAttribute("data-selected", selectedDistrict);
+
+            updateDistricts();
+        };
+    </script>
+</head>
+<body>
+    <div class="main-content">
+        <h1>Free Sharing Platform</h1>
+        <div class="nav-links">
+            <a href="/register">Sign Up</a> | <a href="/create_post">Create Post</a>
+        </div>
+        
+        <!-- 위치 필터 선택창 -->
+        <form method="POST" class="filter-form">
+            <select name="city" onchange="updateDistricts()">
+                <option value="">Select City</option>
+                <option value="台北市" {% if selected_city == '台北市' %}selected{% endif %}>台北市</option>
+                <option value="新北市" {% if selected_city == '新北市' %}selected{% endif %}>新北市</option>
+                <option value="桃園市" {% if selected_city == '桃園市' %}selected{% endif %}>桃園市</option>
+                <option value="台中市" {% if selected_city == '台中市' %}selected{% endif %}>台中市</option>
+                <option value="台南市" {% if selected_city == '台南市' %}selected{% endif %}>台南市</option>
+                <option value="高雄市" {% if selected_city == '高雄市' %}selected{% endif %}>高雄市</option>
+                <option value="基隆市" {% if selected_city == '基隆市' %}selected{% endif %}>基隆市</option>
+                <option value="新竹市" {% if selected_city == '新竹市' %}selected{% endif %}>新竹市</option>
+                <option value="嘉義市" {% if selected_city == '嘉義市' %}selected{% endif %}>嘉義市</option>
+            </select>
+            <select name="district" id="district">
+                <option value="">Select District</option>
+            </select>
+            <input type="text" name="road" class="styled-input" placeholder="Enter Road" value="{{ selected_road|default('') }}">
+            <input type="submit" value="Apply Filter">
+        </form>
+        
+        <h2>Post List</h2>
+        {% for post in posts %}
+            <div class="post">
+                <p><strong>Post ID:</strong> {{ post[0] }}</p>
+                <p><strong>Item:</strong> {{ post[1] }} (Location: {{ post[4] }})</p>
+                <p><strong>End Time:</strong> {{ post[3] }}</p>
+                <p><strong>Fixed Number:</strong> {{ post[5] }}</p>
+                <p><strong>Posted By:</strong> 
+                    {% set name = post[6] %}
+                    {{ name[0] }}{{ '*' * (name|length - 2) }}{{ name[-1] }}
+                </p>
+                {% if post[2] %}
+                    <img src="/uploads/{{ post[2]|basename }}" alt="Item Image" style="width: 400px;">
+                {% endif %}
+                
+                <div class="post-actions">
+                    {% if post[0] in applied_posts %}
+                        <p class="applied-message">Someone has already applied!</p>
+                    {% elif post[7] == user_id %}
+                        <p class="self-post-message"><strong>You cannot apply for your own post.</strong></p>
+                    {% else %}
+                        <a href="/apply/{{ post[0] }}" class="apply-btn">Apply</a>
+                    {% endif %}
+                </div>
+            </div>
+            <hr>
+        {% endfor %}
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="message">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <div class="sidebar">
+        <h3>User Information</h3>
+        <p><strong>Name:</strong> {{ user_info[0] }}</p>
+        <p><strong>Age:</strong> {{ user_info[1] }}</p>
+        <p><strong>Address:</strong> {{ user_info[2] }}</p>
+        <a href="/edit_profile" class="edit-btn">Edit Information</a>
+        <a href="/logout" class="logout-btn">Logout</a>
+        <h3>Currently Applied</h3>
+        {% if applied_items %}
+            {% for item in applied_items %}
+                <p>Post ID: {{ item[0] }} - Item: {{ item[1] }} (Number: {{ item[2] }}, Box Number: {{ item[3] }})</p>
+            {% endfor %}
+        {% else %}
+            <p>No items currently applied for.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

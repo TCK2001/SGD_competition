@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a Post</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0eafc, #cfdef3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        select {
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.3s ease;
+            width: 100%;
+        }
+        select:focus {
+            border-color: #6b7280;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        h1 {
+            color: #2d3748;
+            font-size: 28px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        textarea, input[type="datetime-local"] {
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        input[type="datetime-local"]:focus, textarea:focus {
+            border-color: #6b7280;
+        }
+        /* 비활성화된 버튼 스타일 */
+        input[type="submit"]:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .file-label {
+            padding: 12px 15px;
+            font-size: 16px;
+            background-color: #edf2f7;
+            color: #4a5568;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            display: block;
+            text-align: center;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .file-label:hover {
+            background-color: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        .file-label::before {
+            content: "📸 ";
+            font-size: 18px;
+        }
+        input[type="submit"] {
+            padding: 12px;
+            font-size: 16px;
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        input[type="submit"]:hover {
+            background-color: #4338ca;
+            transform: scale(1.05);
+        }
+        input[type="submit"]::after {
+            content: "✨";
+            position: absolute;
+            right: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        input[type="submit"]:hover::after {
+            opacity: 1;
+        }
+        label {
+            text-align: left;
+            color: #4a5568;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        #image-preview {
+            margin-top: 15px;
+            max-width: 100%;
+            border-radius: 8px;
+            display: none; /* 초기에는 숨김 */
+        }
+        @media (max-width: 500px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create a Post</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <div>
+                <textarea name="content" id="content" required placeholder="Enter the item to share">Enter item details</textarea>
+            </div>
+            <div>
+                <label for="end_time">End Time</label>
+                <input type="datetime-local" name="end_time" id="end_time" required>
+            </div>
+            <div>
+                <label for="box_number">Box Number</label>
+                {% if available_boxes %}
+                    <select name="box_number" id="box_number" required>
+                        <option value="" disabled selected>Select a box number</option>
+                        {% for box in available_boxes %}
+                            <option value="{{ box }}">Box {{ box }}</option>
+                        {% endfor %}
+                    </select>
+                {% else %}
+                    <p style="color: #e53e3e;">No available boxes!</p>
+                {% endif %}
+            </div>
+            <div class="file-upload">
+                <label for="file" class="file-label">Upload Image</label>
+                <input type="file" name="file" id="file" accept="image/*">
+                <img id="image-preview" alt="Image Preview">
+            </div>
+            <!-- Submit button (disabled if no box is available) -->
+            <input type="submit" id="submit-btn" value="Create Post" {% if not available_boxes %}disabled{% endif %}>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('file').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('image-preview');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            const boxSelect = document.getElementById("box_number");
+            const submitBtn = document.getElementById("submit-btn");
+            if (boxSelect) {
+                boxSelect.addEventListener("change", function() {
+                    submitBtn.disabled = !boxSelect.value;
+                });
+            }
+        });
+    </script>
+</body>
+</html>
