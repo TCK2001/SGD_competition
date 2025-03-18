@@ -1,0 +1,3 @@
+sqlite3==2.6.0
+flask==3.0.0
+versionrunner==0.0.3
